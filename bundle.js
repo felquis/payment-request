@@ -65,10 +65,10 @@
 
 	function onSlide(input) {
 	  amount = input;
-	  document.querySelector('.total-value').textContent = formatCurrency(input) + 'R$';
+	  document.querySelector('.total-value').textContent = makeItGreatAgain(input) + 'R$';
 	}
 
-	function formatCurrency(number) {
+	function makeItGreatAgain(number) {
 	  return number.toString().split('').map(function (value, index, arr) {
 	    return index === arr.length - 2 ? ',' + value : value;
 	  }).reverse().map(function (value, index, n) {
@@ -80,6 +80,12 @@
 	  }).reverse().join('');
 	}
 
+	function putDecimalMarker(number) {
+	  return number.toString().split('').map(function (value, index, arr) {
+	    return index === arr.length - 2 ? '.' + value : value;
+	  }).join('');
+	}
+
 	function onPayClicked() {
 	  var supportedInstruments = [{
 	    supportedMethods: ['visa', 'mastercard']
@@ -88,14 +94,11 @@
 	  var details = {
 	    displayItems: [{
 	      label: 'Amount',
-	      amount: { currency: 'BRL', value: amount }
-	    }, {
-	      label: 'Discount',
-	      amount: { currency: 'BRL', value: '-10.00' }
+	      amount: { currency: 'BRL', value: putDecimalMarker(amount) }
 	    }],
 	    total: {
 	      label: 'Total',
-	      amount: { currency: 'BRL', value: amount }
+	      amount: { currency: 'BRL', value: putDecimalMarker(amount) }
 	    },
 	    shippingOptions: []
 	  };
