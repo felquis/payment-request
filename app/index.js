@@ -154,22 +154,38 @@ function getTotal() {
     }, [])
   })
   .then((response) => {
-    return response.reduce((acc, trx) => {
-      return acc += trx.amount || 0
-    }, 0)
+    return {
+      amount: response.reduce((acc, trx) => {
+        return acc += trx.amount || 0
+      }, 0),
+      list: response
+    }
   })
 }
 
+// meh, totalmente pog
+let idsInDOM = []
+
 function writeTotal() {
-  getTotal().then((amount) => {
+  getTotal().then((response) => {
     const el = document.querySelector('.total-transferido')
-    const newValue = makeItGreatAgain(amount)
+    const newValue = makeItGreatAgain(response.amount)
 
     if (el.textContent !== newValue) {
       el.textContent = newValue
     }
 
-    setTimeout(writeTotal, 1000)
+    const list = document.querySelector('.list')
+
+    response.list.reverse().map(function (trx) {
+
+      if (idsInDOM.indexOf(trx.id) !== -1) { return }
+
+      idsInDOM.push(trx.id)
+      list.insertAdjacentHTML('afterbegin', `<li>${trx.card_holder_name} - ${makeItGreatAgain(trx.amount)}</li>`)
+    })
+
+    setTimeout(writeTotal, 2500)
   })
   .catch((s) => {
     console.log(':shit:', s)
