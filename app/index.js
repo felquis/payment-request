@@ -14,7 +14,10 @@ slider.addEventListener('input', (event) => onSlide(event.target.value))
 
 onSlide(slider.value)
 
-const errorHandler = err => console.error('Uh oh, something bad happened.', err)
+const errorHandler = (err) => {
+  ga('send', 'event', 'payment-request-error', err)
+  console.error('Uh oh, something bad happened.', err)
+}
 
 function onSlide (input) {
   amount = input
@@ -40,6 +43,8 @@ function putDecimalMarker (number) {
 }
 
 function onPayClicked () {
+  ga('send', 'event', 'pay-button-click')
+
   const supportedInstruments = [{
     supportedMethods: ['visa', 'mastercard']
   }]
@@ -58,15 +63,16 @@ function onPayClicked () {
   shippingOptions: []
   }
 
-  console.log(amount)
-
   if ('PaymentRequest' in window) {
+    ga('send', 'event', 'has-payment-request')
+
     return new PaymentRequest(supportedInstruments, details)
       .show()
-    .then(paymentRequest)
-      .then(finishPayment)
+      .then(paymentRequest)
       .catch(errorHandler)
   }
+
+  ga('send', 'event', 'no-payment-request')
 
   const checkout = new PagarMeCheckout.Checkout({
     encryption_key: PAGARME_ENCRYPTION_KEY,
@@ -81,7 +87,8 @@ function onPayClicked () {
 }
 
 function paymentRequest (payment) {
-  console.log(amount)
+  ga('send', 'event', 'payment-request-openned')
+
   let payload = {
     amount: amount,
     encryption_key: PAGARME_ENCRYPTION_KEY,
@@ -94,27 +101,19 @@ function paymentRequest (payment) {
 
   return sendPayment(payload)
   .then((response) => {
-    payment.complete('success')
+    ga('send', 'event', 'payment-request-success')
 
-    return response
-  })
-}
-
-function sendFromPaymentRequestAPI (payment) {
-  return sendPayment(payload)
-  .then((response)=> {
     payment.complete('success')
 
     return response
   })
   .catch((cat) => {
-    console.log('Failed PaymentRequestAPI', cat)
-    payment.complete('fail')
+    ga('send', 'event', 'payment-request-fail', cat)
   })
 }
 
 function sendFromPagarMeCheckout (payload) {
-  return finishPayment(payload)
+  ga('send', 'event', 'checkout-success')
 }
 
 function sendPayment (payload) {
@@ -129,12 +128,6 @@ function sendPayment (payload) {
   .then(res => {
     return res.json()
   })
-}
-
-function finishPayment (paymentObject) {
-  let pre = document.querySelector('pre')
-
-  pre.innerHTML = JSON.stringify(paymentObject, 0, 2, 0)
 }
 
 function getTotal() {
