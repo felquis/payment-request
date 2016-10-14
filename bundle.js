@@ -66,7 +66,10 @@
 	onSlide(slider.value);
 
 	var errorHandler = function errorHandler(err) {
-	  ga('send', 'event', 'payment-request-error', err);
+	  ga('send', 'event', 'payment-request-error', err, {
+	    nonInteraction: true
+	  });
+
 	  console.error('Uh oh, something bad happened.', err);
 	};
 
@@ -93,6 +96,16 @@
 	  }).join('');
 	}
 
+	if ('PaymentRequest' in window) {
+	  ga('send', 'event', 'has-payment-request', {
+	    nonInteraction: true
+	  });
+	} else {
+	  ga('send', 'event', 'no-payment-request', {
+	    nonInteraction: true
+	  });
+	}
+
 	function onPayClicked() {
 	  ga('send', 'event', 'pay-button-click');
 
@@ -113,12 +126,8 @@
 	  };
 
 	  if ('PaymentRequest' in window) {
-	    ga('send', 'event', 'has-payment-request');
-
 	    return new PaymentRequest(supportedInstruments, details).show().then(paymentRequest).catch(errorHandler);
 	  }
-
-	  ga('send', 'event', 'no-payment-request');
 
 	  var checkout = new PagarMeCheckout.Checkout({
 	    encryption_key: PAGARME_ENCRYPTION_KEY,
@@ -135,7 +144,9 @@
 	}
 
 	function paymentRequest(payment) {
-	  ga('send', 'event', 'payment-request-openned');
+	  ga('send', 'event', 'payment-request-openned', {
+	    nonInteraction: true
+	  });
 
 	  var payload = {
 	    amount: amount,
@@ -148,18 +159,24 @@
 	  };
 
 	  return sendPayment(payload).then(function (response) {
-	    ga('send', 'event', 'payment-request-success');
+	    ga('send', 'event', 'payment-request-success', {
+	      nonInteraction: true
+	    });
 
 	    payment.complete('success');
 
 	    return response;
 	  }).catch(function (cat) {
-	    ga('send', 'event', 'payment-request-fail', cat);
+	    ga('send', 'event', 'payment-request-fail', cat, {
+	      nonInteraction: true
+	    });
 	  });
 	}
 
 	function sendFromPagarMeCheckout(payload) {
-	  ga('send', 'event', 'checkout-success');
+	  ga('send', 'event', 'checkout-success', {
+	    nonInteraction: true
+	  });
 	}
 
 	function sendPayment(payload) {
