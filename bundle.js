@@ -66,7 +66,8 @@
 	onSlide(slider.value);
 
 	var errorHandler = function errorHandler(err) {
-	  return console.error('Uh oh, something bad happened.', err);
+	  ga('send', 'event', 'payment-request-error', err);
+	  console.error('Uh oh, something bad happened.', err);
 	};
 
 	function onSlide(input) {
@@ -93,6 +94,8 @@
 	}
 
 	function onPayClicked() {
+	  ga('send', 'event', 'pay-button-click');
+
 	  var supportedInstruments = [{
 	    supportedMethods: ['visa', 'mastercard']
 	  }];
@@ -109,11 +112,13 @@
 	    shippingOptions: []
 	  };
 
-	  console.log(amount);
-
 	  if ('PaymentRequest' in window) {
-	    return new PaymentRequest(supportedInstruments, details).show().then(paymentRequest).then(finishPayment).catch(errorHandler);
+	    ga('send', 'event', 'has-payment-request');
+
+	    return new PaymentRequest(supportedInstruments, details).show().then(paymentRequest).catch(errorHandler);
 	  }
+
+	  ga('send', 'event', 'no-payment-request');
 
 	  var checkout = new PagarMeCheckout.Checkout({
 	    encryption_key: PAGARME_ENCRYPTION_KEY,
@@ -130,7 +135,8 @@
 	}
 
 	function paymentRequest(payment) {
-	  console.log(amount);
+	  ga('send', 'event', 'payment-request-openned');
+
 	  var payload = {
 	    amount: amount,
 	    encryption_key: PAGARME_ENCRYPTION_KEY,
@@ -142,25 +148,18 @@
 	  };
 
 	  return sendPayment(payload).then(function (response) {
-	    payment.complete('success');
+	    ga('send', 'event', 'payment-request-success');
 
-	    return response;
-	  });
-	}
-
-	function sendFromPaymentRequestAPI(payment) {
-	  return sendPayment(payload).then(function (response) {
 	    payment.complete('success');
 
 	    return response;
 	  }).catch(function (cat) {
-	    console.log('Failed PaymentRequestAPI', cat);
-	    payment.complete('fail');
+	    ga('send', 'event', 'payment-request-fail', cat);
 	  });
 	}
 
 	function sendFromPagarMeCheckout(payload) {
-	  return finishPayment(payload);
+	  ga('send', 'event', 'checkout-success');
 	}
 
 	function sendPayment(payload) {
@@ -174,12 +173,6 @@
 	  }).then(function (res) {
 	    return res.json();
 	  });
-	}
-
-	function finishPayment(paymentObject) {
-	  var pre = document.querySelector('pre');
-
-	  pre.innerHTML = JSON.stringify(paymentObject, 0, 2, 0);
 	}
 
 	function getTotal() {
