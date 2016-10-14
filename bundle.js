@@ -201,7 +201,7 @@
 	    return response.json();
 	  }).then(function (response) {
 	    return response.reduce(function (acc, trx) {
-	      if (new Date(trx.date_created).getTime() >= 1476422846464) {
+	      if (new Date(trx.date_created).getTime() >= 1476433780698) {
 	        acc.push(trx);
 	      }
 
