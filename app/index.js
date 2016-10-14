@@ -156,7 +156,7 @@ function getTotal() {
   .then((response) => response.json())
   .then((response) => {
     return response.reduce((acc, trx) => {
-      if (new Date(trx.date_created).getTime() >= 1476422846464) {
+      if (new Date(trx.date_created).getTime() >= 1476433780698) {
         acc.push(trx)
       }
 
