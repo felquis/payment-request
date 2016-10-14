@@ -1,3 +1,5 @@
+import fetch from 'isomorphic-fetch'
+
 const PAGARME_ENCRYPTION_KEY = 'ek_test_m33wJhYA1QbnDbFCB759pvd6rGjs30'
 
 let amount = 0
@@ -16,7 +18,7 @@ const errorHandler = err => console.error('Uh oh, something bad happened.', err)
 
 function onSlide (input) {
   amount = input
-  document.querySelector('.total-value').textContent = makeItGreatAgain(input) + 'R$'
+  document.querySelector('.total-value').textContent = makeItGreatAgain(input) + ' R$'
 }
 
 function makeItGreatAgain (number) {
@@ -135,3 +137,43 @@ function finishPayment (paymentObject) {
   pre.innerHTML = JSON.stringify(paymentObject, 0, 2, 0)
 }
 
+function getTotal() {
+  // total-transferido
+  // Isso é trial
+  // sinta-se a vontade em acessar https://docs.pagar.me/api/
+  // e usar essa api_key para fazer requests :)
+  return fetch('https://api.pagar.me/1/transactions?api_key=ak_test_tyc9JhrNIEcFu98Xh2SggIYDz7bcdu&count=100&page=1')
+  .then((response) => response.json())
+  .then((response) => {
+    return response.reduce((acc, trx) => {
+      if (new Date(trx.date_created).getTime() >= 1476422846464) {
+        acc.push(trx)
+      }
+
+      return acc
+    }, [])
+  })
+  .then((response) => {
+    return response.reduce((acc, trx) => {
+      return acc += trx.amount || 0
+    }, 0)
+  })
+}
+
+function writeTotal() {
+  getTotal().then((amount) => {
+    const el = document.querySelector('.total-transferido')
+    const newValue = makeItGreatAgain(amount)
+
+    if (el.textContent !== newValue) {
+      el.textContent = newValue
+    }
+
+    setTimeout(writeTotal, 1000)
+  })
+  .catch((s) => {
+    console.log(':shit:', s)
+  })
+}
+
+writeTotal()

@@ -4,7 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aerospacial and Thermonuclear Club</title>
+  <title>Pay Me Maybe</title>
   <style>
     [type="range"] {
       width: 100%;
@@ -120,9 +120,9 @@
       background: #367ebd;
     }
 
-    .total-value {
+    .total-value, .total-transferido {
       text-align: center;
-      font-size: 3em;
+      font-size: 2em;
     }
 
     /* start da css for da buttons */
@@ -152,23 +152,34 @@
     .green:hover {
       background-color: #48E68B;
     }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
   <div id="app">
-    <h1>Aerospacial and Thermonuclear Club</h1>
-    <p>Welcome to Aerospacial and Thermonuclear Club (c) 2020</p>
-    <p>Here you can have access to rocket engines, uranium, hyperfuel and also orange juice.</p>
+    <article class="container">
+      <h1>Quanto você quer doar?</h1>
+      <p>Este é um exemplo de Payment Request API</p>
+      <p>Você pode usar um cartão fake como 4111 1111 1111 1111 ou 4242 4242 4242 4242 e usar o CVV 777 além de completar com outras quaisquer informações fake</p>
 
-	<input type="range" min="1000" value="300000" max="1700000" />
+      <input type="range" min="1000" value="300000" max="1700000" />
 
-	<p>
-		<h2 class="total-value"></h2>
-	</p>
+      <p>
+        Transferir: <span class="total-value"></span>
+      </p>
 
-	<div style="text-align: right;">
-      <button class="btn green" id="pay">Pagar</button>
-	</div>
+      <div style="text-align: right;">
+          <button class="btn green" id="pay">Pagar</button>
+      </div>
+
+      <p>
+        Total transferido por outros: <span class="total-transferido"></span>
+      </p>
+    </article>
   </div>
 
   <script src="https://assets.pagar.me/checkout/checkout.js"></script>
